@@ -60,17 +60,6 @@ make latexpdf   # builds PDF
 make html       # builds HTML
 ```
 
-## Role in the MakerPlane / MAOS Ecosystem
-
-This specification is the **shared language** for the entire avionics stack:
-
-- [can-fix-arduinolib](../can-fix-arduinolib) — Arduino implementation of this protocol
-- [fix-gateway](../fix-gateway) — Software data broker that speaks CAN-FIX (among many other protocols)
-- [pyEfis](../pyEfis) — EFIS display that consumes FIX parameter data
-- [pyAvMap](../pyAvMap) — Moving map that consumes LAT/LONG/heading from the FIX data stream
-
-Any MAOS subsystem that needs to publish or consume avionics data should reference the `canfix.json` parameter list as the authoritative source of parameter names, units, and ranges before defining custom data interfaces.
-
 ## Important Disclaimer
 
 > This specification is developed for Experimental Amateur-Built aircraft use only.  
