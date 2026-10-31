@@ -50,8 +50,8 @@ class TestTopLevelStructure:
         assert "status" in spec
 
     def test_parameter_count(self, parameters):
-        assert len(parameters) == 230, (
-            f"Expected 230 parameters, got {len(parameters)}"
+        assert len(parameters) == 232, (
+            f"Expected 232 parameters, got {len(parameters)}"
         )
 
     def test_group_count(self, groups):
@@ -250,3 +250,26 @@ class TestKnownParameters:
         assert p is not None
         assert p["name"] == "Trim Switches"
         assert p["type"] == "WORD"
+
+
+# -- Navigation deviation ------------------------------------------------------
+
+class TestNavDeviation:
+    """482/483 carry needle deflection, signed, as a fraction of full scale.
+
+    448 is unsigned and in degrees, and 449 is in degrees; neither can drive a
+    CDI or glideslope needle without receiver knowledge the display lacks.
+    """
+
+    @pytest.mark.parametrize("pid", [482, 483])
+    def test_normalized_deviation_is_signed_percent_of_full_scale(self, parameters, pid):
+        p = next(x for x in parameters if x["id"] == pid)
+        assert p["type"] == "INT"
+        assert (p["min"], p["max"]) == ("-100", "100")
+        assert (p["multiplier"], p["units"]) == ("0.1", "%FS")
+        assert p["index"].startswith("Receiver")
+
+    @pytest.mark.parametrize("old, new", [(448, 482), (449, 483)])
+    def test_degree_deviation_points_at_its_replacement(self, parameters, old, new):
+        p = next(x for x in parameters if x["id"] == old)
+        assert p["remarks"][0].startswith(f"Deprecated: use {new}")
