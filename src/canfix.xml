@@ -678,7 +678,8 @@
   <min>0</min>
   <max>359.9</max>
   <units>0.1°</units>
-  <remarks></remarks>
+  <remarks>Deprecated: use 482, VOR/LOC Deviation (Normalized)</remarks>
+  <remarks>Unsigned, so it cannot carry a deviation left of course</remarks>
 </parameter>
 <parameter>
   <id>449</id>
@@ -688,7 +689,8 @@
   <min>-45</min>
   <max>45</max>
   <units>0.01°</units>
-  <remarks></remarks>
+  <remarks>Deprecated: use 483, Glideslope Deviation (Normalized)</remarks>
+  <remarks>A display cannot turn degrees into needle deflection without the facility's full-scale angle</remarks>
 </parameter>
 <parameter>
   <id>450</id>
@@ -996,6 +998,33 @@
   <type></type>
   <index>Aircraft</index>
   <remarks>Event Driven Information</remarks>
+</parameter>
+<parameter>
+  <id>482</id>
+  <count>1</count>
+  <name>VOR/LOC Deviation (Normalized)</name>
+  <type>INT</type>
+  <min>-100</min>
+  <max>100</max>
+  <units>0.1 %FS</units>
+  <index>Receiver (0 = NAV1, 1 = NAV2)</index>
+  <remarks>Needle deflection as a percentage of full scale; +/-100 = full-scale deflection</remarks>
+  <remarks>Positive = needle right of center (course lies to the right, fly right)</remarks>
+  <remarks>The receiver applies its own VOR or LOC sensitivity</remarks>
+  <remarks>Replaces 448, which is unsigned and in degrees</remarks>
+</parameter>
+<parameter>
+  <id>483</id>
+  <count>1</count>
+  <name>Glideslope Deviation (Normalized)</name>
+  <type>INT</type>
+  <min>-100</min>
+  <max>100</max>
+  <units>0.1 %FS</units>
+  <index>Receiver (0 = NAV1, 1 = NAV2)</index>
+  <remarks>Needle deflection as a percentage of full scale; +/-100 = full-scale deflection</remarks>
+  <remarks>Positive = needle above center (aircraft below the glideslope, fly up)</remarks>
+  <remarks>Replaces 449, which is in degrees</remarks>
 </parameter>
 <parameter>
   <id>512</id>
