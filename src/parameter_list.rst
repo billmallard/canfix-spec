@@ -644,6 +644,9 @@ VOR/LOC Deviation
 :Range\:: 0 to 359.9
 :Units\:: 0.1°
 :FIX Id\:: VORDEV
+:Remarks\::
+  | Deprecated: use 482, VOR/LOC Deviation (Normalized)
+  | Unsigned, so it cannot carry a deviation left of course
 
 Glideslope Deviation
 ~~~~~~~~~~~~~~~~~~~~
@@ -653,6 +656,9 @@ Glideslope Deviation
 :Range\:: -45 to 45
 :Units\:: 0.01°
 :FIX Id\:: GSDEV
+:Remarks\::
+  | Deprecated: use 483, Glideslope Deviation (Normalized)
+  | A display cannot turn degrees into needle deflection without the facility's full-scale angle
 
 OBI Flags
 ~~~~~~~~~
@@ -933,6 +939,33 @@ ADS-B ES Operational Status
 :Index\:: Aircraft
 :Remarks\::
   | Event Driven Information
+
+VOR/LOC Deviation (Normalized)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:Identifier\:: 482 (0x1E2)
+:Data Type\:: INT
+:Range\:: -100 to 100
+:Units\:: 0.1 %FS
+:Index\:: Receiver (0 = NAV1, 1 = NAV2)
+:Remarks\::
+  | Needle deflection as a percentage of full scale; +/-100 = full-scale deflection
+  | Positive = needle right of center (course lies to the right, fly right)
+  | The receiver applies its own VOR or LOC sensitivity
+  | Replaces 448, which is unsigned and in degrees
+
+Glideslope Deviation (Normalized)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:Identifier\:: 483 (0x1E3)
+:Data Type\:: INT
+:Range\:: -100 to 100
+:Units\:: 0.1 %FS
+:Index\:: Receiver (0 = NAV1, 1 = NAV2)
+:Remarks\::
+  | Needle deflection as a percentage of full scale; +/-100 = full-scale deflection
+  | Positive = needle above center (aircraft below the glideslope, fly up)
+  | Replaces 449, which is in degrees
 
 
 High Priority Engine / Aircraft System Data

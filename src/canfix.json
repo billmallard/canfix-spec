@@ -882,7 +882,10 @@
             "min": "0",
             "multiplier": "0.1",
             "name": "VOR/LOC Deviation",
-            "remarks": null,
+            "remarks": [
+                "Deprecated: use 482, VOR/LOC Deviation (Normalized)",
+                "Unsigned, so it cannot carry a deviation left of course"
+            ],
             "type": "UINT",
             "units": "\u00b0"
         },
@@ -895,7 +898,10 @@
             "min": "-45",
             "multiplier": "0.01",
             "name": "Glideslope Deviation",
-            "remarks": null,
+            "remarks": [
+                "Deprecated: use 483, Glideslope Deviation (Normalized)",
+                "A display cannot turn degrees into needle deflection without the facility's full-scale angle"
+            ],
             "type": "INT",
             "units": "\u00b0"
         },
@@ -1276,6 +1282,41 @@
                 "Event Driven Information"
             ],
             "type": ""
+        },
+        {
+            "count": 1,
+            "id": 482,
+            "index": "Receiver (0 = NAV1, 1 = NAV2)",
+            "max": "100",
+            "metadata": {},
+            "min": "-100",
+            "multiplier": "0.1",
+            "name": "VOR/LOC Deviation (Normalized)",
+            "remarks": [
+                "Needle deflection as a percentage of full scale; +/-100 = full-scale deflection",
+                "Positive = needle right of center (course lies to the right, fly right)",
+                "The receiver applies its own VOR or LOC sensitivity",
+                "Replaces 448, which is unsigned and in degrees"
+            ],
+            "type": "INT",
+            "units": "%FS"
+        },
+        {
+            "count": 1,
+            "id": 483,
+            "index": "Receiver (0 = NAV1, 1 = NAV2)",
+            "max": "100",
+            "metadata": {},
+            "min": "-100",
+            "multiplier": "0.1",
+            "name": "Glideslope Deviation (Normalized)",
+            "remarks": [
+                "Needle deflection as a percentage of full scale; +/-100 = full-scale deflection",
+                "Positive = needle above center (aircraft below the glideslope, fly up)",
+                "Replaces 449, which is in degrees"
+            ],
+            "type": "INT",
+            "units": "%FS"
         },
         {
             "count": 2,
