@@ -55,11 +55,18 @@ The specification covers the full avionics parameter set for a modern aircraft:
 | `src/requirements.rst` | Protocol requirements |
 | `src/practices.rst` | Recommended implementation practices |
 | `tools/gen_param_reference.py` | Generates the wiki parameter quick-reference from `canfix.json` |
-| `tools/sync_wiki.sh` | Mirrors `wiki/` to the GitHub wiki clone for publishing |
+| `wiki/` | Source of the GitHub wiki pages |
+| `.github/workflows/wiki-sync.yml` | Publishes `wiki/` to the GitHub wiki on every merge to `master` |
+| `tools/sync_wiki.sh` | Previews the wiki mirror in a local clone (does not push) |
 
 > **Editing parameters:** change `src/CAN-FIX.ods` (the master), then regenerate
 > the derived files with the commands below. Do not hand-edit `canfix.json`,
 > `canfix.xml`, or `parameters.rst` — they are overwritten on every build.
+
+> **Editing the wiki:** the GitHub wiki is generated from `wiki/` by
+> `.github/workflows/wiki-sync.yml` on every merge to `master`. Edit the pages
+> here, not in the wiki; direct wiki edits are overwritten. The workflow also
+> regenerates `Parameter-Reference.md` from `src/canfix.json` before publishing.
 
 ## Building the Documentation
 
