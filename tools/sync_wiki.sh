@@ -6,6 +6,9 @@
 # copies the wiki pages into a sibling ../canfix-spec.wiki working copy. It does
 # NOT push -- review the result and push it yourself (publishing is outward-facing).
 #
+# Publishing is now done by .github/workflows/wiki-sync.yml on every merge to
+# master; use this script only to preview the mirror locally.
+#
 # Usage:
 #   tools/sync_wiki.sh [wiki-remote-url] [wiki-clone-dir]
 #

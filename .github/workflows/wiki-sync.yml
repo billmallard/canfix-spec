@@ -1,0 +1,83 @@
+name: wiki-sync
+
+# Publish wiki/ to this repo's GitHub wiki on every merge to master.
+#
+# wiki/ is the source of truth: the wiki is overwritten from it with
+# rsync --delete, so pages renamed or removed here are renamed or removed there,
+# and any edit made directly in the wiki is lost on the next run. Edit the pages
+# in wiki/ and land them by PR.
+#
+# This does what tools/sync_wiki.sh does, without its copy-only limits:
+#   1. regenerate wiki/Parameter-Reference.md from src/canfix.json
+#      (tools/gen_param_reference.py), so the published table always matches
+#      the spec data -- which is why src/canfix.json is a trigger path too;
+#   2. strip a .md suffix from inter-page links (](Page.md) -> ](Page)).
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "wiki/**"
+      - "src/canfix.json"
+      - "tools/gen_param_reference.py"
+      - ".github/workflows/wiki-sync.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wiki-sync
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # This fork's work is landed upstream (makerplane/*) later. The guard keeps
+    # a copy of this file from ever publishing upstream's wiki.
+    if: github.repository == 'billmallard/canfix-spec'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Publish wiki/ to the wiki
+        env:
+          # The built-in token may not be allowed to push to the wiki. If the
+          # push fails with 403, add a WIKI_TOKEN secret (a fine-grained token
+          # with Contents read/write on this repo) and re-run; it wins when set.
+          TOKEN: ${{ secrets.WIKI_TOKEN || github.token }}
+          SRC: wiki
+        run: |
+          set -euo pipefail
+          short="${GITHUB_SHA::7}"
+          stage="$RUNNER_TEMP/stage"
+          # Cloned outside the checkout: the source folder is itself named wiki/.
+          wiki="$RUNNER_TEMP/wiki"
+
+          # 1. Regenerate the parameter quick-reference (stdlib-only script).
+          python3 tools/gen_param_reference.py
+          if ! git diff --quiet -- "$SRC/Parameter-Reference.md"; then
+            echo "::warning file=$SRC/Parameter-Reference.md::the committed page is stale against src/canfix.json; publishing the regenerated one. Run tools/gen_param_reference.py and commit the result."
+          fi
+
+          # 2. Stage the pages with the link rewrite.
+          rsync -a --exclude .git "$SRC/" "$stage/"
+          for f in "$stage"/*.md; do
+            sed -i -e 's#\](\([A-Za-z0-9_-]*\)\.md\([)#]\)#](\1\2#g' "$f"
+          done
+
+          # 3. Mirror the stage onto the wiki.
+          git clone --depth 1 "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git" "$wiki"
+          rsync -a --delete --exclude .git "$stage/" "$wiki/"
+          cd "$wiki"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Wiki already matches $SRC @ $short; nothing to publish."
+            exit 0
+          fi
+          git diff --cached --stat
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898699+github-actions[bot]@users.noreply.github.com" \
+              commit -q -m "Sync from $SRC @ $short"
+          git push origin HEAD:master
