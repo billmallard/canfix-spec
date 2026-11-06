@@ -37,6 +37,7 @@ are the groups used by the [Parameter Quick-Reference](Parameter-Reference):
 | 1152 - 1279 | Normal Priority Navigation Data |
 | 1280 - 1407 | Normal Priority Engine / Aircraft System Data |
 | 1408 - 1535 | Normal Priority Auxiliary Data |
+| 1536 - 1759 | Reserved for future use |
 
 ## Normal Data frame
 

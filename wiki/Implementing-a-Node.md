@@ -3,7 +3,7 @@
 A practical get-started checklist for building a CAN-FiX node. It summarizes the
 specification; the binding rules are in the
 [Requirements](https://billmallard.github.io/canfix-spec/requirements.html) and
-[Best Practices](https://billmallard.github.io/canfix-spec/practices.html)
+[Recommended Practices](https://billmallard.github.io/canfix-spec/practices.html)
 chapters, with frame details in
 [Frame Definitions](https://billmallard.github.io/canfix-spec/framedef.html).
 
@@ -12,9 +12,10 @@ chapters, with frame details in
 - Choose a **Node ID** in **1-255**, unique on the network (0 is the broadcast
   address, never a real node).
 - Use the **CAN 2.0B base frame** (11-bit identifier) only.
-- Default to a network **bit rate** the installation agrees on -- the protocol
-  defines `125k / 250k / 500k / 1M` and a [Bit Rate Set](Frame-Format#control-codes)
-  message to change it.
+- Support **125 kbps and 250 kbps**; both are mandatory, and **125 kbps is the
+  default**. 500 kbps and 1 Mbps are optional. A
+  [Bit Rate Set](Frame-Format#control-codes) message changes the rate; never
+  send one in flight.
 - Read the bus as you transmit (standard CAN arbitration); a lower identifier
   always wins, so your most critical parameters belong at lower IDs.
 
@@ -33,6 +34,9 @@ For each thing your node measures:
      [data type](Data-Types) (`raw = engineering / multiplier`)
 3. Transmit it periodically. Send only what your node is responsible for.
 
+Data types and units cannot be substituted: if you send a parameter, it must use
+the type and units the specification gives it.
+
 **Quality matters.** When a reading is suspect or failed, set the **Quality** or
 **Failure** bit in the Function Code rather than sending a silently-wrong value.
 Set **Annunciate** when a value crosses an alarm threshold. See
@@ -40,7 +44,7 @@ Set **Annunciate** when a value crosses an alarm threshold. See
 
 **Send your meta data.** If a parameter has alarm set points or ranges (e.g. oil
 pressure limits, V-speeds), the *measuring* node should transmit them as meta data
-(Function Code meta-data bits 1-15) so every display stays consistent without
+(meta-data values 1-15 in the upper four bits of the Function Code) so every display stays consistent without
 separate configuration. This is a core design principle of CAN-FiX.
 
 ## 3. Handle the mandatory node-specific messages
@@ -56,6 +60,14 @@ Every node **must** respond to these [control codes](Frame-Format#control-codes)
 | 3 | Disable Parameter | Stop broadcasting the named parameter |
 | 4 | Enable Parameter | Resume broadcasting the named parameter |
 | 5 | Node Report | Immediately send every parameter you own, plus its meta data |
+
+Store the bit rate, the Node ID and which parameters are enabled or disabled in
+non-volatile memory, so these changes survive a power cycle.
+
+**Show you are alive.** Send at least one frame that carries your Node ID
+(explicitly, or implied by the identifier) every 2 seconds. Two-way channel
+frames do not count. The recommended way is a Node Status Information message
+(control code 6) with the status word set to `0x0000`, once per second.
 
 Optional messages (firmware update, two-way channels, node configuration,
 node status, point-to-point Parameter Set) are described in the
