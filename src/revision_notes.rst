@@ -29,6 +29,7 @@ Version 0.7 - |date|
   * Remove VOR / ILS Frequency "Set" Parameters (IDs 1224 = 1227)
   * Remove Altimeter Setting "Set" Parameter (ID 400)
   * Add General Requirements chapter
+  * Add stable identifiers (CFX-...) to each General Requirement
   * Change Bit Rate Set message error code to 0xFF
   * Change Node ID Set message response
   * General style, grammer and spelling fixes
