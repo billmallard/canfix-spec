@@ -1,6 +1,10 @@
 name: ci
 
-# Structural validation of src/canfix.json (tests/test_canfix_spec.py).
+# Structural validation of src/canfix.json (tests/test_canfix_spec.py), and a
+# drift check: src/canfix.json and src/canfix.xml are generated from
+# src/CAN-FIX.ods, so the job regenerates both and fails on any difference. A
+# hand edit to either side -- the spreadsheet or a generated file -- then shows
+# up as a red check instead of passing silently.
 
 on:
   push:
@@ -21,3 +25,25 @@ jobs:
           python-version: "3.12"
       - run: pip install pytest
       - run: python -m pytest tests -v
+
+  generated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyexcel pyexcel-ods
+      - name: Regenerate canfix.json and canfix.xml from CAN-FIX.ods
+        working-directory: src
+        run: |
+          python canfix_json.py > /dev/null
+          python canfix_xml.py > /dev/null
+      - name: Fail if a committed generated file differs
+        run: |
+          if ! git diff --exit-code --stat -- src/canfix.json src/canfix.xml; then
+            git diff -- src/canfix.json src/canfix.xml > "$RUNNER_TEMP/drift.diff"
+            head -n 200 "$RUNNER_TEMP/drift.diff"
+            echo "::error::src/canfix.json or src/canfix.xml does not match src/CAN-FIX.ods. Edit the spreadsheet, run canfix_json.py and canfix_xml.py in src/, and commit the results together."
+            exit 1
+          fi
