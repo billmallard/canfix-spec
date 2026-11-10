@@ -37,4 +37,22 @@ confusing but it is also highly flexible.  We actually have room in this
 protocol to measure 512 different exhaust gas temperatures on a single bus.  If
 you need more than that you, can probably afford to run another network.
 
+Divergence from upstream
+------------------------
+
+This copy of the specification is the billmallard fork of the MakerPlane
+CAN-FIX specification.  The fork changes the contract where the project needs
+it, without waiting on upstream (ORG-011).  Every such change is listed here
+and in the remarks of the parameter it affects.
+
+* **VOR/LOC Deviation (Normalized) and Glideslope Deviation (Normalized),
+  482 and 483.**  New parameters.  Upstream has neither.
+* **Fuel Quantity tank numbering, 550 - 553.**  Upstream names the index
+  ("Aux Tank") but does not say how it combines with the identifier.  The
+  fork defines it: tank *n*, counting from 1, is sent on identifier
+  550 + ((*n* - 1) mod 4) with index floor((*n* - 1) / 4).  Tanks 1 - 4 stay
+  on 550 - 553 at index 0, which is what existing nodes already send.
+  Tanks that share an identifier must be sent by the same node, by the rule
+  above.
+
 .. include:: parameter_list.rst
