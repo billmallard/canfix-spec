@@ -273,3 +273,53 @@ class TestNavDeviation:
     def test_degree_deviation_points_at_its_replacement(self, parameters, old, new):
         p = next(x for x in parameters if x["id"] == old)
         assert p["remarks"][0].startswith(f"Deprecated: use {new}")
+
+
+# -- Fuel Quantity tank numbering -----------------------------------------------
+
+def fuel_tank_frame(n):
+    """Identifier and index for tank n (1-based), per the 550-553 remarks."""
+    return 550 + (n - 1) % 4, (n - 1) // 4
+
+
+class TestFuelTankNumbering:
+    """550-553 reach any tank count through the index byte.
+
+    Upstream names the index ("Aux Tank") but gives no rule for combining it
+    with the identifier, so a fifth tank had no defined place on the bus.
+    """
+
+    def _fuelq(self, parameters):
+        return next(x for x in parameters if x["id"] == 550)
+
+    def test_remarks_state_the_rule(self, parameters):
+        p = self._fuelq(parameters)
+        assert (p["count"], p["index"]) == (4, "Aux Tank")
+        assert p["remarks"][0] == (
+            "Tank n, counting from 1, is sent on identifier "
+            "550 + ((n-1) mod 4) with index floor((n-1)/4)"
+        )
+
+    def test_remarks_require_one_node_per_identifier(self, parameters):
+        remarks = self._fuelq(parameters)["remarks"]
+        assert any("must be sent by the same node" in r for r in remarks)
+
+    def test_remarks_record_the_divergence(self, parameters):
+        remarks = self._fuelq(parameters)["remarks"]
+        assert any(r.startswith("Divergence from upstream") for r in remarks)
+
+    def test_tanks_one_to_four_are_unchanged(self):
+        assert [fuel_tank_frame(n) for n in range(1, 5)] == [
+            (550, 0), (551, 0), (552, 0), (553, 0)]
+
+    def test_tank_five_is_index_one(self):
+        assert fuel_tank_frame(5) == (550, 1)
+        assert fuel_tank_frame(8) == (553, 1)
+
+    def test_every_tank_fits_one_identifier_and_index_byte(self, parameters):
+        p = self._fuelq(parameters)
+        frames = [fuel_tank_frame(n) for n in range(1, 1025)]
+        assert len(set(frames)) == 1024
+        assert all(p["id"] <= i < p["id"] + p["count"] and 0 <= x <= 255
+                   for i, x in frames)
+        assert fuel_tank_frame(1025)[1] == 256
