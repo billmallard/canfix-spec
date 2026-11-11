@@ -7,6 +7,8 @@ Version 0.7 - |date|
   * Add VOR/LOC Deviation (Normalized) and Glideslope Deviation (Normalized),
     signed percent of full scale, indexed by receiver.  Deprecate the
     degree-based VOR/LOC Deviation and Glideslope Deviation
+  * Define how Fuel Quantity identifiers and index combine into a tank
+    number, so a fifth and later tank has a place on the bus
   * Move Node Specific Messages to a higher priority than the Two-Way Channels
   * Change Appendix to be Recommended Practices
   * Change Encoder Input data type to INT[2],BYTE.  This adds another axis

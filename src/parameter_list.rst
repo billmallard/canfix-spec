@@ -1263,6 +1263,11 @@ Fuel Quantity
   | 0110 = High Warn
   | 0111 = High Alarm
 
+:Remarks\::
+  | Tank n, counting from 1, is sent on identifier 550 + ((n-1) mod 4) with index floor((n-1)/4)
+  | Tanks 1-4 are identifiers 550-553 at index 0, tanks 5-8 are 550-553 at index 1, and so on to 1024 tanks
+  | Tanks that share an identifier (for example 1 and 5) must be sent by the same node
+  | Divergence from upstream: the tank numbering rule is defined by this fork (ORG-011)
 
 Fuel Pump Pressure
 ~~~~~~~~~~~~~~~~~~

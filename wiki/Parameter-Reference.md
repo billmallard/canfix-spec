@@ -142,7 +142,7 @@ For the full normative definitions (data encodings, frame formats, meta data and
 | 544-545 | Oil Pressure | UINT | psi |  | 0.01 |  |
 | 546-547 | Oil Temperature | UINT | °C |  | 0.1 |  |
 | 548-549 | Coolant Temperature | UINT | °C |  | 0.1 |  |
-| 550-553 | Fuel Quantity | UINT | gal |  | 0.01 | Indexed by Aux Tank |
+| 550-553 | Fuel Quantity | UINT | gal |  | 0.01 | Indexed by Aux Tank; Tank n, counting from 1, is sent on identifier 550 + ((n-1) mod 4) with index floor((n-1)/4); Tanks 1-4 are identifiers 550-553 at index 0, tanks 5-8 are 550-553 at index 1, and so on to 1024 tanks; Tanks that share an identifier (for example 1 and 5) must be sent by the same node; Divergence from upstream: the tank numbering rule is defined by this fork (ORG-011) |
 | 554-555 | Fuel Pump Pressure | UINT | psi |  | 0.01 |  |
 | 556-557 | Oil Quantity | UINT | gal |  | 0.01 |  |
 | 558-559 | Coolant Quantity | UINT | gal |  | 0.01 |  |
